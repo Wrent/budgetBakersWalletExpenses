@@ -6,11 +6,15 @@
     <script src="js/API_SETTINGS.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="js/lib/bootstrap.min.js"></script>
-    <link href='css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <script src="js/lib/jquery-ui.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.4/d3.min.js"></script>
     <script src="js/lib/d3pie.min.js"></script>
+    <script src="js/lib/jQDateRangeSlider-withRuler-min.js"></script>
     <script src="js/wallet.js"></script>
     <script src="js/graphSettings.js"></script>
+    <link href='css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <link href='css/iThing-min.css' rel='stylesheet' type='text/css'>
+    <link href='css/jquery-ui-1.8.10.custom.css' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
@@ -18,12 +22,23 @@
 <h1>My Wallet</h1>
 
     <div id="balance"></div>
+
+    <div id="slider"></div>
+    <button id="setToLastMonth" type="button" class="btn btn-primary">Set to last month</button>
+
     <div id="pieChart"></div>
 
     <script>
         updateBalance();
         getCategories();
         getRecords();
+
+        $("#slider").dateRangeSlider();
+
+        $("#setToLastMonth").click(function() {
+            console.log("clicked");
+            setSliderToLastMonth();
+        });
     </script>
 </div>
 </body>

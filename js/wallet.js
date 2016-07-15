@@ -6,6 +6,8 @@
 var api_key = GLOBAL_API_KEY;
 data = {};
 pieData = {};
+minDate = new Date();
+today = minDate;
 
 function sendRequest(target, onReadyFunction) {
     //create the request
@@ -59,17 +61,23 @@ function getRecords() {
 
                 $.each(records, function(i, object) {
                     var record = {
-                        date: object.date,
+                        date: parseDate(object.date),
                         amount: object.amount,
                         note: object.note,
                         paymentType: object.paymentType
                     };
+
+                    if (record.date < minDate) {
+                        minDate = record.date;
+                    }
+
                     if (data[object.categoryId] != undefined) {
                         data[object.categoryId].records.push(record);
                     }
                 });
                 console.log(data);
                 preparePieData();
+                setSlider();
             }
         });
 }
@@ -95,4 +103,42 @@ function preparePieData() {
     GLOBAl_GRAPH_SETTINGS.data = pieData;
     console.log(GLOBAl_GRAPH_SETTINGS);
     pie = new d3pie("pieChart", GLOBAl_GRAPH_SETTINGS);
+}
+
+function setSlider() {
+    $("#slider").dateRangeSlider(
+        "option", {
+            bounds: {
+                min: minDate,
+                max: today
+            },
+            range: {
+                min: {
+                    days: 7
+                }
+            }
+    });
+    setSliderToLastMonth();
+}
+
+function parseDate(dateString) {
+    var re = /^([\d]{4})-([\d]{2})-([\d]{2})T([\d]{2}):([\d]{2})/;
+    var m;
+
+    if ((m = re.exec(dateString)) !== null) {
+        if (m.index === re.lastIndex) {
+            re.lastIndex++;
+        }
+        // View your result using the m-variable.
+        // eg m[0] etc.
+    }
+
+    var date = new Date(m[1], m[2] - 1, m[3], m[4], m[5]);
+    return date;
+}
+
+function setSliderToLastMonth() {
+    var monthBefore = new Date(today.getTime());
+    monthBefore.setMonth(monthBefore.getMonth() - 1);
+    $("#slider").dateRangeSlider("values", monthBefore, today);
 }
