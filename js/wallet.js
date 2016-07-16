@@ -1,6 +1,8 @@
 /**
  * Created by akucera on 7/14/16.
  */
+//todo currency problem
+
 
 //api key
 var api_key = GLOBAL_API_KEY;
@@ -76,14 +78,15 @@ function getRecords() {
                     }
                 });
                 console.log(data);
-                preparePieData();
                 setSlider();
+                preparePieData();
             }
         });
 }
 
 function preparePieData() {
     pieData.content = [];
+    var totalSum = 0;
 
     for (var category in data) {
         var datum = {
@@ -92,16 +95,18 @@ function preparePieData() {
         };
         var sum = 0;
         $.each(data[category].records, function(i, record) {
-           //we will exclude income
-            if (record.amount < 0) {
+            //we will exclude income
+            if (record.amount < 0 && includeRecord(record.date)) {
                 sum += Math.abs(record.amount);
             }
         });
         datum.value = Math.round(sum);
+        totalSum += sum;
         pieData.content.push(datum);
     }
     GLOBAl_GRAPH_SETTINGS.data = pieData;
     console.log(GLOBAl_GRAPH_SETTINGS);
+    $("#periodSum").text(totalSum);
     pie = new d3pie("pieChart", GLOBAl_GRAPH_SETTINGS);
 }
 
@@ -116,9 +121,21 @@ function setSlider() {
                 min: {
                     days: 7
                 }
+            },
+            formatter: function(val){
+                val = new Date(val);
+                var days = val.getDate(),
+                    month = val.getMonth() + 1,
+                    year = val.getFullYear();
+                return days + ". " + month + ". " + year;
             }
     });
     setSliderToLastMonth();
+
+    $("#slider").on("valuesChanged", function(e, data) {
+        pie.destroy();
+        preparePieData();
+    })
 }
 
 function parseDate(dateString) {
@@ -129,8 +146,6 @@ function parseDate(dateString) {
         if (m.index === re.lastIndex) {
             re.lastIndex++;
         }
-        // View your result using the m-variable.
-        // eg m[0] etc.
     }
 
     var date = new Date(m[1], m[2] - 1, m[3], m[4], m[5]);
@@ -141,4 +156,12 @@ function setSliderToLastMonth() {
     var monthBefore = new Date(today.getTime());
     monthBefore.setMonth(monthBefore.getMonth() - 1);
     $("#slider").dateRangeSlider("values", monthBefore, today);
+}
+
+function includeRecord(date) {
+    var values = $("#slider").dateRangeSlider("values");
+    if (date <= values.max && date >= values.min) {
+        return true;
+    }
+    return false;
 }
