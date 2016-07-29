@@ -1,14 +1,13 @@
 /**
  * Created by akucera on 7/14/16.
  */
-//todo currency problem
-
 
 //api key
 var api_key = GLOBAL_API_KEY;
 data = {};
 curr = {};
 pieData = {};
+recordsInRange = {};
 minDate = new Date();
 today = minDate;
 
@@ -110,12 +109,47 @@ function getRecords() {
                 console.log(data);
                 setSlider();
                 preparePieData();
+                showRecords();
             }
         });
 }
 
+function showRecords() {
+    recordsInRange.sort(SortByDate);
+
+    $("#records").find('tbody').empty();
+    $.each(recordsInRange, function(i, record) {
+        $("#records").find('tbody:last-child')
+            .append($('<tr>').css("background-color", shadeRGBColor(record.category.color, 0.4))
+                .append($('<td>')
+                    .append(printFormattedDateTime(record.date))
+                )
+                .append($('<td>')
+                    .append(record.category.label)
+                )
+                .append($('<td>')
+                    .append(record.note)
+                )
+                .append($('<td>')
+                    .append(record.amount)
+                )
+                .append($('<td>')
+                    .append(record.paymentType)
+                )
+            );
+    });
+}
+
+function SortByDate(a, b){
+    var aDate = a.date;
+    var bDate = b.date;
+    return ((aDate < bDate) ? 1 : ((aDate > bDate) ? -1 : 0));
+}
+
+
 function preparePieData() {
     pieData.content = [];
+    recordsInRange = [];
     var totalSum = 0;
 
     for (var category in data) {
@@ -125,10 +159,16 @@ function preparePieData() {
         };
         var sum = 0;
         $.each(data[category].records, function(i, record) {
-            //we will exclude income
-            if (record.amount < 0 && includeRecord(record.date)) {
-                sum += Math.abs(record.amount);
+
+            if (includeRecord(record.date)) {
+                record.category = datum;
+                recordsInRange.push(record);
+                //we will exclude income for the graph
+                if (record.amount < 0) {
+                    sum += Math.abs(record.amount);
+                }
             }
+
         });
         datum.value = Math.round(sum);
         totalSum += sum;
@@ -154,10 +194,7 @@ function setSlider() {
             },
             formatter: function(val){
                 val = new Date(val);
-                var days = val.getDate(),
-                    month = val.getMonth() + 1,
-                    year = val.getFullYear();
-                return days + ". " + month + ". " + year;
+                printFormattedDate(val);
             }
     });
     setSliderToLastMonth();
@@ -165,6 +202,7 @@ function setSlider() {
     $("#slider").on("valuesChanged", function(e, data) {
         pie.destroy();
         preparePieData();
+        showRecords();
     })
 }
 
@@ -194,4 +232,24 @@ function includeRecord(date) {
         return true;
     }
     return false;
+}
+
+function printFormattedDate(val) {
+    var days = val.getDate(),
+        month = val.getMonth() + 1,
+        year = val.getFullYear();
+    return days + ". " + month + ". " + year;
+}
+
+function printFormattedDateTime(val) {
+    var hours = val.getHours(),
+        minutes = val.getMinutes();
+    return printFormattedDate(val) + " " + hours + ":" + minutes;
+}
+
+
+//from http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+function shadeRGBColor(color, percent) {
+    var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+    return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
 }
