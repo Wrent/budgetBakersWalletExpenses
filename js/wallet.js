@@ -252,8 +252,8 @@ function printFormattedDate(val) {
 }
 
 function printFormattedDateTime(val) {
-    var hours = val.getHours(),
-        minutes = val.getMinutes();
+    var hours = val.getHours() < 10 ? "0" + val.getHours() : val.getHours(),
+        minutes = val.getMinutes()< 10 ? "0" + val.getMinutes() : val.getMinutes();
     return printFormattedDate(val) + " " + hours + ":" + minutes;
 }
 

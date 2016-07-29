@@ -58,7 +58,7 @@ var GLOBAl_GRAPH_SETTINGS = {
         "pullOutSegmentOnClick": {
             "effect": "linear",
             "speed": 400,
-            "size": 8
+            "size": 15
         }
     }
 };
