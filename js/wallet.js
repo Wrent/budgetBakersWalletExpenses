@@ -7,6 +7,7 @@
 //api key
 var api_key = GLOBAL_API_KEY;
 data = {};
+curr = {};
 pieData = {};
 minDate = new Date();
 today = minDate;
@@ -30,7 +31,7 @@ function updateBalance() {
                 if (this.status === 200) {
                     balance = JSON.parse(this.responseText).amount;
                 }
-                $("#balance").text(balance);
+                $("#balance").text(balance + " " + getReferentialCurrencyCode());
             }
         });
 }
@@ -54,6 +55,34 @@ function getCategories() {
         });
 }
 
+function getCurrencies() {
+    sendRequest('https://api.budgetbakers.com/api/v1/currencies',
+        function () {
+            if (this.readyState === 4) {
+                var currencies = JSON.parse(this.responseText);
+
+                $.each(currencies, function(i, object) {
+                    curr[object.id] = {
+                        code: object.code,
+                        referential: object.referential,
+                        ratioToReferential: object.ratioToReferential
+                    }
+                });
+            }
+            console.log(curr);
+        });
+}
+
+function getReferentialCurrencyCode() {
+    var code = "Unknown currency";
+    $.each(curr, function(i, object) {
+        if (object.referential) {
+            code = object.code;
+        }
+    });
+    return code;
+}
+
 
 function getRecords() {
     sendRequest('https://api.budgetbakers.com/api/v1/records',
@@ -64,10 +93,11 @@ function getRecords() {
                 $.each(records, function(i, object) {
                     var record = {
                         date: parseDate(object.date),
-                        amount: object.amount,
+                        amount: object.amount * 1/curr[object.currencyId].ratioToReferential,
                         note: object.note,
-                        paymentType: object.paymentType
+                        paymentType: object.paymentType,
                     };
+
 
                     if (record.date < minDate) {
                         minDate = record.date;
