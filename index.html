@@ -54,6 +54,17 @@
             console.log("clicked");
             setSliderToLastMonth();
         });
+
+        $(document).click(function() {
+            if(pie.getOpenSegment()) {
+                pie.closeSegment();
+                showRecords();
+            }
+        });
+
+        $("#pieChart").click(function (e) {
+            e.stopPropagation();
+        })
     </script>
 </div>
 </body>

@@ -190,6 +190,8 @@ function onClickSegment(segmentData) {
     showRecords(segmentData.data.label);
 }
 
+
+
 function setSlider() {
     $("#slider").dateRangeSlider(
         "option", {
