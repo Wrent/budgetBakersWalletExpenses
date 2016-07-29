@@ -114,29 +114,33 @@ function getRecords() {
         });
 }
 
-function showRecords() {
+function showRecords(filterCategory) {
+
+
     recordsInRange.sort(SortByDate);
 
     $("#records").find('tbody').empty();
     $.each(recordsInRange, function(i, record) {
-        $("#records").find('tbody:last-child')
-            .append($('<tr>').css("background-color", shadeRGBColor(record.category.color, 0.4))
-                .append($('<td>')
-                    .append(printFormattedDateTime(record.date))
-                )
-                .append($('<td>')
-                    .append(record.category.label)
-                )
-                .append($('<td>')
-                    .append(record.note)
-                )
-                .append($('<td>')
-                    .append(record.amount)
-                )
-                .append($('<td>')
-                    .append(record.paymentType)
-                )
-            );
+        if (typeof filterCategory === 'undefined' || filterCategory == record.category.label) {
+            $("#records").find('tbody:last-child')
+                .append($('<tr>').css("background-color", shadeRGBColor(record.category.color, 0.4))
+                    .append($('<td>')
+                        .append(printFormattedDateTime(record.date))
+                    )
+                    .append($('<td>')
+                        .append(record.category.label)
+                    )
+                    .append($('<td>')
+                        .append(record.note)
+                    )
+                    .append($('<td>')
+                        .append(record.amount)
+                    )
+                    .append($('<td>')
+                        .append(record.paymentType)
+                    )
+                );
+        }
     });
 }
 
@@ -177,7 +181,13 @@ function preparePieData() {
     GLOBAl_GRAPH_SETTINGS.data = pieData;
     console.log(GLOBAl_GRAPH_SETTINGS);
     $("#periodSum").text(totalSum);
+    GLOBAl_GRAPH_SETTINGS.callbacks = {};
+    GLOBAl_GRAPH_SETTINGS.callbacks.onClickSegment = onClickSegment;
     pie = new d3pie("pieChart", GLOBAl_GRAPH_SETTINGS);
+}
+
+function onClickSegment(segmentData) {
+    showRecords(segmentData.data.label);
 }
 
 function setSlider() {
