@@ -25,8 +25,8 @@ var GLOBAl_GRAPH_SETTINGS = {
         "location": "bottom-center"
     },
     "size": {
-        "canvasHeight": 600,
-        "canvasWidth": 900,
+        "canvasHeight": 500,
+        "canvasWidth": 500,
         "pieOuterRadius": "88%"
     },
     "labels": {

@@ -30,7 +30,7 @@ function updateBalance() {
                 if (this.status === 200) {
                     balance = JSON.parse(this.responseText).amount;
                 }
-                $("#balance").text(balance + " " + getReferentialCurrencyCode());
+                $("#balance").text(Math.round(balance) + " " + getReferentialCurrencyCode());
             }
         });
 }
@@ -107,6 +107,7 @@ function getRecords() {
                     }
                 });
                 console.log(data);
+                showDataPort();
                 setSlider();
                 preparePieData();
                 showRecords();
@@ -180,7 +181,7 @@ function preparePieData() {
     }
     GLOBAl_GRAPH_SETTINGS.data = pieData;
     console.log(GLOBAl_GRAPH_SETTINGS);
-    $("#periodSum").text(totalSum);
+    $("#periodSum").text(Math.round(totalSum));
     GLOBAl_GRAPH_SETTINGS.callbacks = {};
     GLOBAl_GRAPH_SETTINGS.callbacks.onClickSegment = onClickSegment;
     pie = new d3pie("pieChart", GLOBAl_GRAPH_SETTINGS);
@@ -189,8 +190,6 @@ function preparePieData() {
 function onClickSegment(segmentData) {
     showRecords(segmentData.data.label);
 }
-
-
 
 function setSlider() {
     $("#slider").dateRangeSlider(
@@ -204,9 +203,10 @@ function setSlider() {
                     days: 7
                 }
             },
+            valueLabels: "change",
             formatter: function(val){
                 val = new Date(val);
-                printFormattedDate(val);
+                return printFormattedDate(val);
             }
     });
     setSliderToLastMonth();
@@ -215,6 +215,8 @@ function setSlider() {
         pie.destroy();
         preparePieData();
         showRecords();
+        $("#periodStart").text(printFormattedDate($("#slider").dateRangeSlider("values").min));
+        $("#periodEnd").text(printFormattedDate($("#slider").dateRangeSlider("values").max));
     })
 }
 
@@ -264,4 +266,9 @@ function printFormattedDateTime(val) {
 function shadeRGBColor(color, percent) {
     var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
     return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+}
+
+function showDataPort() {
+    $("#dataPort").show();
+    $("#loadingPlaceholder").hide();
 }

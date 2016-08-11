@@ -20,28 +20,31 @@
 <body>
 <div class="container-fluid">
 <h1>My Wallet</h1>
+    <div id="loadingPlaceholder">
+        Wait, your data is loading...
+    </div>
 
-    <div>Current balance: <span id="balance"></span></div>
-
-    <div id="slider"></div>
+    <div id="slider" style="width: 60%;"></div>
     <button id="setToLastMonth" type="button" class="btn btn-primary">Set to last month</button>
-
-    <div>Expenses in this period: <span id="periodSum"></span></div>
-    <div id="pieChart"></div>
-
-    <table id="records" class="table table-hover">
-        <thead>
-            <th>Date</th>
-            <th>Category</th>
-            <th>Note</th>
-            <th>Amount</th>
-            <th>Type</th>
-        </thead>
-        <tbody>
-
-        </tbody>
-    </table>
-
+    <div id="dataPort" style="display: none;">
+        <div>Current balance: <span id="balance"></span></div>
+        <div>Showing period: <span id="periodStart"></span> - <span id="periodEnd"></span></div>
+        <div>Expenses in this period: <span id="periodSum"></span></div>
+        <div id="pieChart" style="width: 40%; background-color: whitesmoke"></div>
+    
+        <table id="records" class="table table-hover">
+            <thead>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Note</th>
+                <th>Amount</th>
+                <th>Type</th>
+            </thead>
+            <tbody>
+    
+            </tbody>
+        </table>
+    </div>
     <script>
         updateBalance();
         getCategories();
